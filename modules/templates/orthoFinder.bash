@@ -4,18 +4,14 @@ set -euo pipefail
 
 if [[ "$tarfile" == *".gz"* ]];then
     tar xzf $tarfile
+    rm *.tar.gz
 else
     tar xf $tarfile
+    rm *.tar
 fi
 
 mv **/* .
 rm -r */
-
-if [[ "$tarfile" == *".gz"* ]];then
-    rm *.tar.gz
-else
-    rm *.tar
-fi
 
 for f in *; do mv "\$f" "\$f.fasta"; done
 
