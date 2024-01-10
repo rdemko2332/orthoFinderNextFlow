@@ -2,29 +2,41 @@
 nextflow.enable.dsl=2
 
 //---------------------------------------------------------------
-// Param Checking 
+// Including Workflows
 //---------------------------------------------------------------
 
-if(params.tarFile) {
-  tarFile = Channel.fromPath( params.tarFile )
-}
-else {
-  throw new Exception("Missing params.tarFile")
-}
+include { allBlastWorkflow } from './modules/peripheral.nf'
+include { bestRepBlastWorkflow } from './modules/peripheral.nf'
+include { listToPairwiseComparisons; coreOrResidualWorkflow as coreWorkflow } from './modules/core.nf'
 
-//--------------------------------------------------------------------------
-// Includes
-//--------------------------------------------------------------------------
+//---------------------------------------------------------------
+// allBlast
+//---------------------------------------------------------------
 
-include { OrthoFinder } from './modules/orthoFinder.nf'
+workflow allBlastEntry {
+  if(params.peripheralProteomes) {
+    inputFile = Channel.fromPath(params.peripheralProteomes)
+  }
+  else {
+    throw new Exception("Missing params.peripheralProteome")
+  }
 
-//--------------------------------------------------------------------------
-// Main Workflow
-//--------------------------------------------------------------------------
-
-workflow {
-  
-  OrthoFinder(tarFile)
-
+  allBlastWorkflow(inputFile)
+   
 }
 
+//---------------------------------------------------------------
+// bestRepBlast
+//---------------------------------------------------------------
+
+ workflow bestRepBlastEntry {
+   if(params.peripheralProteomes) {
+     inputFile = Channel.fromPath(params.peripheralProteomes)
+   }
+   else {
+     throw new Exception("Missing params.peripheralProteome")
+   }
+
+   bestRepBlastWorkflow(inputFile)
+   
+ }
